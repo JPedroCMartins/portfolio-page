@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>João Pedro Correia Martins - Desenvolvedor de Software</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --dark-bg: #1a1a2e;
+            /* Fundo principal escuro */
+            --dark-card: #16213e;
+            /* Fundo dos cards/navbar */
+            --dark-primary: #0f3460;
+            /* Detalhe primário */
+            --highlight: #e94560;
+            /* Cor de destaque/ação */
+            --text-light: #f0f0f0;
+            /* Texto principal */
+            --text-secondary: #a7a9be;
+            /* Texto secundário */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            /* Para o data-bs-spy funcionar corretamente */
+            position: relative;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .section-padding {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            width: 80px;
+            height: 4px;
+            background-color: var(--highlight);
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        /* --- Navbar --- */
+        .navbar {
+            background-color: var(--dark-card) !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar .navbar-brand {
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        .navbar .nav-link {
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .navbar .nav-link.active,
+        .navbar .nav-link:hover {
+            color: var(--highlight);
+        }
+
+        /* --- Hero --- */
+        #inicio {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        #inicio h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+        }
+
+        #inicio .text-highlight {
+            color: var(--highlight);
+        }
+
+        .typed-cursor {
+            color: var(--highlight);
+            font-size: 3.5rem;
+        }
+
+        #inicio .btn-highlight {
+            background-color: var(--highlight);
+            color: var(--text-light);
+            border: 2px solid var(--highlight);
+            font-weight: 600;
+            padding: 12px 30px;
+            transition: all 0.3s;
+        }
+
+        #inicio .btn-highlight:hover {
+            background-color: transparent;
+            color: var(--highlight);
+        }
+
+        /* --- Habilidades --- */
+        .skill-icon-box {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--dark-card);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .skill-icon-box:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .skill-icon-box i {
+            font-size: 3.5rem;
+            color: var(--highlight);
+        }
+
+        .skill-icon-box h5 {
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        /* --- Timeline (Experiência/Formação) --- */
+        .timeline {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            background-color: var(--dark-primary);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -2px;
+        }
+
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+        }
+
+        .timeline-item::after {
+            /* Círculo na linha */
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background-color: var(--text-light);
+            border: 4px solid var(--highlight);
+            top: 20px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .timeline-item.left {
+            left: 0;
+        }
+
+        .timeline-item.right {
+            left: 50%;
+        }
+
+        .timeline-item.right::after {
+            left: -10px;
+        }
+
+        .timeline-content {
+            padding: 20px;
+            background-color: var(--dark-card);
+            position: relative;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .timeline-content .date {
+            color: var(--highlight);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .timeline-content h4 {
+            margin-bottom: 10px;
+        }
+
+        .timeline-content p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Responsivo para Timeline */
+        @media screen and (max-width: 768px) {
+            .timeline::after {
+                left: 31px;
+            }
+
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+
+            .timeline-item.right {
+                left: 0%;
+            }
+
+            .timeline-item.left::after,
+            .timeline-item.right::after {
+                left: 21px;
+            }
+        }
+
+        /* --- Projetos --- */
+        .card {
+            background-color: var(--dark-card);
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+        }
+
+        .card-img-top {
+            height: 220px;
+            object-fit: cover;
+            filter: grayscale(30%);
+            transition: filter 0.3s;
+        }
+
+        .card:hover .card-img-top {
+            filter: grayscale(0%);
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .card-text {
+            color: var(--text-secondary);
+        }
+
+        .card-footer {
+            background-color: var(--dark-primary);
+            border-top: none;
+        }
+
+        .card-footer a {
+            color: var(--highlight);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .card-footer a:hover {
+            color: var(--text-light);
+        }
+
+        .tech-badge {
+            background-color: var(--dark-primary);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* --- Contato --- */
+        #contato {
+            background-color: var(--dark-card);
+        }
+
+        .form-control {
+            background-color: var(--dark-bg);
+            border: 2px solid var(--dark-primary);
+            color: var(--text-light);
+        }
+
+        .form-control:focus {
+            background-color: var(--dark-bg);
+            border-color: var(--highlight);
+            color: var(--text-light);
+            box-shadow: none;
+        }
+
+        .btn-submit {
+            background-color: var(--highlight);
+            color: var(--text-light);
+            border: 2px solid var(--highlight);
+            font-weight: 600;
+            padding: 12px 30px;
+            transition: all 0.3s;
+        }
+
+        .btn-submit:hover {
+            background-color: transparent;
+            color: var(--highlight);
+        }
+
+        .social-links a {
+            font-size: 2rem;
+            color: var(--text-secondary);
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: var(--highlight);
+        }
+
+        /* --- Rodapé --- */
+        footer {
+            background-color: var(--dark-bg);
+            padding: 20px 0;
+            text-align: center;
+            border-top: 1px solid var(--dark-primary);
+        }
+
+        footer p {
+            margin: 0;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+
+<body data-bs-spy="scroll" data-bs-target="#navbar-portfolio">
+
+    <nav id="navbar-portfolio" class="navbar navbar-expand-lg fixed-top" data-bs-theme="dark">
+        <div class="container">
+            <a class="navbar-brand" href="#inicio">João Pedro Correia Martins</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#inicio">Início</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#habilidades">Habilidades</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#jornada">Jornada</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#projetos">Projetos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header id="inicio" class="hero-section">
+        <div class="container" data-aos="fade-in">
+            <p class="lead mb-2">OLÁ, MEU NOME É</p>
+            <h1 class="display-3 mb-3">JOÃO PEDRO CORREIA MARTINS</h1>
+            <h2 class="display-5 mb-4">
+                Eu sou <span id="typed-hero" class="text-highlight"></span>
+            </h2>
+            <a href="#projetos" class="btn btn-highlight btn-lg mt-3">Ver Meus Projetos</a>
+        </div>
+    </header>
+
+    <section id="sobre" class="section-padding">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Sobre Mim</h2>
+            <div class="row align-items-center">
+                <div class="col-lg-4 text-center" data-aos="fade-right" data-aos-delay="200">
+                    <img src="foto.jpg" class="img-fluid rounded-circle" alt="Foto de João Pedro Correia Martins"
+                        style="border: 5px solid var(--dark-primary);">
+                </div>
+                <div class="col-lg-8" data-aos="fade-left" data-aos-delay="400">
+                    <h3 class="mb-3">Quem sou eu?</h3>
+                    <p class="text-secondary lead">
+                        Sou um desenvolvedor de software apaixonado por tecnologia e focado em criar soluções que
+                        resolvem problemas reais.
+                        Minha especialidade é o desenvolvimento backend com Python e Flask, mas também tenho experiência
+                        sólidas em frontend e outras tecnologias...
+                    </p>
+                    <p class="text-secondary">
+                        Atualmente estou estudando Engenharia da Computação na UNIVERSIDADE DO NORTE (UNINORTE) em
+                        Manaus, estou sempre em busca de novos desafios e
+                        oportunidades para aprender e aplicar meus conhecimentos em projetos inovadores.
+                    </p>
+                    <a href="" class="btn btn-outline-light mt-3" download>Download CV</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="habilidades" class="section-padding" style="background-color: var(--dark-primary);">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Minhas Habilidades</h2>
+            <div class="row g-4">
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="skill-icon-box">
+                        <i class="bi bi-filetype-py"></i>
+                        <h5>Python</h5>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="skill-icon-box">
+                        <i class="bi bi-filetype-html"></i>
+                        <h5>Web Programming</h5>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="skill-icon-box">
+                        <i class="bi bi bi-filetype-java"></i>
+                        <h5>Java</h5>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="400">
+                    <div class="skill-icon-box">
+                        <i class="bi bi-filetype-js"></i>
+                        <h5>JavaScript</h5>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="500">
+                    <div class="skill-icon-box">
+                        <i class="bi bi-bootstrap"></i>
+                        <h5>Bootstrap</h5>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="600">
+                    <div class="skill-icon-box">
+                        <i class="bi bi-box-seam"></i>
+                        <h5>Flask</h5>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="700">
+                    <div class="skill-icon-box">
+                        <i class="bi bi-database-fill"></i>
+                        <h5>SQL</h5>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="800">
+                    <div class="skill-icon-box">
+                        <i class="bi bi-code-slash"></i>
+                        <h5>Sistemas Operacionais</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="jornada" class="section-padding">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Minha Jornada</h2>
+            <div class="timeline">
+                <div class="timeline-item left" data-aos="fade-right">
+                    <div class="timeline-content">
+                        <div class="date">2023 - 2027</div>
+                        <h4>Engenharia da Computação</h4>
+                        <h5>Uninorte</h5>
+                        <p>Cursando graduação com foco em desenvolvimento de software, arquitetura de computadores e
+                            inteligência artificial.</p>
+                    </div>
+                </div>
+                <div class="timeline-item right" data-aos="fade-left">
+                    <div class="timeline-content">
+                        <div class="date">04/2024 - 11/2024</div>
+                        <h4>Desenvolvedor de Sistemas Junior</h4>
+                        <h5>Super G</h5>
+                        <p>Desenvolvimento e manutenção de aplicação Web e Mobile, integração com bancos de dados
+                            PostgreSQL(Supabase).</p>
+                    </div>
+                </div>
+                <div class="timeline-item left" data-aos="fade-right">
+                    <div class="timeline-content">
+                        <div class="date">01/2025 - 05/2025</div>
+                        <h4>Projeto Freelancer - Sistema de reserva de mesa (ChatBot)</h4>
+
+                        <p>Criação de um sistema de gerenciamento interno completo de reserva de mesa, desde o design do
+                            banco de dados até a interface do usuário (ChatBot).</p>
+                    </div>
+                </div>
+                <div class="timeline-item right" data-aos="fade-left">
+                    <div class="timeline-content">
+                        <div class="date">08/2026</div>
+                        <h4>Projeto voluntário - ChatBot</h4>
+                        <h5>CETAM</h5>
+                        <p>Criação de um sistema de chatbot para retirar dúvidas de usuários e obter informações sobre
+                            cursos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projetos" class="section-padding" style="background-color: var(--dark-primary);">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Meus Projetos</h2>
+            <div class="row g-4">
+
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card h-100">
+                        <img src="background_projeto_1.jpg" class="card-img-top" alt="Projeto 1">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title" style="color: #f0f0f0;">Memorial Virtual</h5>
+                            <p class="card-text flex-grow-1">Eternize
+                                aqui a memória daquela pessoa
+                                especial. Compartilhe homenagens, fotos,
+                                histórias e mensagens que celebram a
+                                vida,
+                                o legado e os momentos inesquecíveis
+                                vividos ao lado dela. Gere um QR Code ou
+                                compartilhe o link do memorial com
+                                amigos e familiares para que todos
+                                possam acessar
+                                e prestar suas homenagens.</p>
+                            <div>
+                                <span class="badge tech-badge">Python</span>
+                                <span class="badge tech-badge">Flask</span>
+                                <span class="badge tech-badge">SQLite</span>
+                                <span class="badge tech-badge">Docker</span>
+                            </div>
+                        </div>
+
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+
+                            <a href="https://github.com/JPedroCMartins/memorial" target="_blank">
+                                <i class="bi bi-github"></i> Ver Código
+                            </a>
+
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm dropdown-toggle"
+                                    style="--bs-btn-color: var(--highlight); --bs-btn-border-color: var(--highlight); --bs-btn-hover-color: #fff; --bs-btn-hover-bg: var(--highlight); --bs-btn-hover-border-color: var(--highlight); --bs-btn-active-color: #fff; --bs-btn-active-bg: var(--highlight); --bs-btn-active-border-color: var(--highlight);"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-eye-fill"></i> Acessar
+                                </button>
+
+                                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item" href="https://m.p-martins.com/m/preview" target="_blank">
+                                            <i class="bi bi-search me-2"></i>Preview do Memorial
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="https://m.p-martins.com/m" target="_blank">
+                                            <i class="bi bi-plus-circle me-2"></i>Criar seu memorial
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </section>
+
+    <section id="contato" class="section-padding">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Entre em Contato</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-8" data-aos="fade-up" data-aos-delay="200">
+                    <p class="text-center lead mb-4 text-secondary">Estou aberto a novas oportunidades e colaborações.
+                        Sinta-se à vontade para me enviar um e-mail.</p>
+                    <h5 class="text-center">jpedro7682@gmail.com</h5>
+
+                    <div class="text-center mt-5 social-links">
+                        <p class="text-secondary">Ou me encontre por aqui:</p>
+                        <a href="https://github.com/JPedroCMartins" target="_blank"><i class="bi bi-github"></i></a>
+                        <a href="https://www.linkedin.com/in/jpedrocmartins" target="_blank"><i
+                                class="bi bi-linkedin"></i></a>
+                        <a href="mailto:{jpedro7682@gmail.com}"><i class="bi bi-envelope-fill"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 João Pedro Correia Martins. Desenvolvido com Flask e Bootstrap.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+
+    <script>
+        // Inicializa o AOS (Animação ao Rolar)
+        AOS.init({
+            duration: 800, // Duração da animação
+            once: true      // Animar apenas uma vez
+        });
+
+        // Inicializa o Typed.js (Efeito de Digitação)
+        var typed = new Typed('#typed-hero', {
+            strings: [
+                'Desenvolvedor Python',
+                'Engenheiro de Computação',
+                'Especialista em Backend',
+                'Entusiasta de Sistema Linux'
+            ],
+            typeSpeed: 50,  // Velocidade de digitação
+            backSpeed: 30,  // Velocidade ao apagar
+            loop: true,     // Repetir
+            backDelay: 2000 // Tempo antes de começar a apagar
+        });
+    </script>
+
+</body>
+
+</html>
