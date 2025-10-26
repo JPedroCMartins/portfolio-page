@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, send_from_directory
+from flask import Flask, redirect, url_for, send_from_directory, jsonify
 import json
 import os
 
@@ -30,6 +30,16 @@ def qr_code():
 
     # Redireciona para a função serve_index
     return redirect(url_for('serve_index'))
+
+@app.route('/qrcode/ver_acessos')
+def ver_acessos():
+    caminho_arquivo = 'acesso.json'
+    if os.path.exists(caminho_arquivo):
+        with open(caminho_arquivo, 'r') as f:
+            dados = json.load(f)
+    else:
+        dados = {'acessos': 0}
+    return jsonify(dados)
 
 @app.route('/<path:path>')
 def serve_static(path):
