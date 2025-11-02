@@ -1,8 +1,33 @@
 from flask import Flask, redirect, url_for, send_from_directory, jsonify
+from flask_cors import CORS
 import json
 import os
 
 app = Flask(__name__, static_folder="static")
+CORS(app)
+@app.route('/status')
+def get_server_status():
+    """
+    Este é o endpoint de "health check" (verificação de saúde).
+    Ele simplesmente retorna um JSON indicando que o servidor está online.
+    """
+    try:
+        # No futuro, você poderia adicionar lógicas mais complexas aqui,
+        # como verificar a conexão com o banco de dados.
+        
+        response = {
+            "status": "online",
+            "message": "Servidor operando normalmente."
+        }
+        return jsonify(response), 200 # Retorna o JSON e o código de status 200 (OK)
+    
+    except Exception as e:
+        # Se algo der errado na sua verificação
+        response = {
+            "status": "error",
+            "message": str(e)
+        }
+        return jsonify(response), 500 # Retorna erro 500 (Internal Server Error)
 
 @app.route('/')
 def serve_index():

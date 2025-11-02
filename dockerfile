@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 # Instala Flask e Gunicorn (servidor de produção)
-RUN pip install --no-cache-dir flask gunicorn
+RUN pip install --no-cache-dir flask gunicorn flask-cors==6.0.1
 
 # Expõe a porta 8000
 EXPOSE 8000
