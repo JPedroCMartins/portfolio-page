@@ -4,14 +4,19 @@ FROM python:3.11-slim
 # Define diretório de trabalho
 WORKDIR /app
 
-# Copia o código e os arquivos da landing
+# 1. Copia APENAS o arquivo de dependências
+COPY requirements.txt .
+
+# 2. Instala as dependências
+# Isso fica em cache e não roda toda vez
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 3. Copia TODO o resto do código
 COPY . .
 
-# Instala Flask e Gunicorn (servidor de produção)
-RUN pip install --no-cache-dir flask gunicorn flask-cors==6.0.1 requests
-
-# Expõe a porta 8000
+# Expõe a porta 8000 (para o Gunicorn)
 EXPOSE 8000
 
-# Usa Gunicorn em vez do servidor de desenvolvimento
+# O comando CMD será definido no docker-compose
+# Deixamos um aqui como padrão, mas o compose irá sobrescrevê-lo.
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]

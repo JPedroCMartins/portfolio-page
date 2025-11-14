@@ -11,21 +11,14 @@ app = Flask(__name__, static_folder="static")
 CORS(app)
 
 # --- Configuração do Bot do Telegram ---
-# É ALTAMENTE RECOMENDÁVEL usar variáveis de ambiente em vez de colar os valores aqui.
+# O TOKEN ainda é necessário para o bot ENVIAR mensagens.
 # No terminal, antes de rodar o app, faça (Linux/macOS):
 # export TELEGRAM_BOT_TOKEN="SEU_TOKEN_AQUI"
-# export TELEGRAM_CHAT_ID="SEU_CHAT_ID_AQUI"
-#
-# No Windows (CMD):
-# set TELEGRAM_BOT_TOKEN="SEU_TOKEN_AQUI"
-# set TELEGRAM_CHAT_ID="SEU_CHAT_ID_AQUI"
-#
-# (No PowerShell):
-# $env:TELEGRAM_BOT_TOKEN="SEU_TOKEN_AQUI"
-# $env:TELEGRAM_CHAT_ID="SEU_CHAT_ID_AQUI"
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 
-TELEGRAM_BOT_TOKEN = '8554899678:AAFrQZRcF2a9LP6tqVnj8K_r-zU2fc1ntoo'
-TELEGRAM_CHAT_ID = 5557053215
+# Este arquivo irá armazenar os chat_ids dos usuários inscritos.
+# O outro script (bot_listener.py) irá preenchê-lo.
+SUBSCRIBERS_FILE = 'subscribers.json'
 
 # Função para escapar caracteres especiais do MarkdownV2 do Telegram
 def escape_markdown(text):
@@ -37,14 +30,39 @@ def escape_markdown(text):
     # Adiciona uma barra invertida antes de cada um desses caracteres
     return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
 
+def get_subscribers():
+    """Lê a lista de IDs de assinantes do arquivo JSON."""
+    if not os.path.exists(SUBSCRIBERS_FILE):
+        return [] # Retorna lista vazia se o arquivo não existir
+    
+    try:
+        with open(SUBSCRIBERS_FILE, 'r') as f:
+            data = json.load(f)
+            # Espera-se que o JSON contenha uma lista de IDs
+            if isinstance(data, list):
+                return data
+            else:
+                return []
+    except json.JSONDecodeError:
+        print(f"Erro ao ler o arquivo {SUBSCRIBERS_FILE}. Arquivo corrompido?")
+        return []
+    except Exception as e:
+        print(f"Erro inesperado ao ler {SUBSCRIBERS_FILE}: {e}")
+        return []
+
 def send_telegram_notification(visitor_info):
     """
-    Envia uma mensagem formatada para o chat do Telegram.
+    Envia uma mensagem formatada para TODOS os assinantes.
     Esta função é executada em uma thread separada.
     """
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        print("!! Variáveis de ambiente TELEGRAM_BOT_TOKEN ou TELEGRAM_CHAT_ID não definidas.")
+    if not TELEGRAM_BOT_TOKEN:
+        print("!! Variável de ambiente TELEGRAM_BOT_TOKEN não definida.")
         print("!! Notificação não será enviada.")
+        return
+
+    subscribers = get_subscribers()
+    if not subscribers:
+        print("Nenhum assinante encontrado. Nenhuma notificação será enviada.")
         return
 
     # Formata a data e hora
@@ -68,26 +86,28 @@ def send_telegram_notification(visitor_info):
     # URL da API do Telegram
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     
-    # Dados a serem enviados
-    payload = {
-        'chat_id': TELEGRAM_CHAT_ID,
-        'text': message,
-        'parse_mode': 'MarkdownV2' # Habilita a formatação Markdown
-    }
+    # Envia a notificação para CADA assinante
+    print(f"Enviando notificação para {len(subscribers)} assinante(s)...")
+    for chat_id in subscribers:
+        payload = {
+            'chat_id': chat_id,
+            'text': message,
+            'parse_mode': 'MarkdownV2' # Habilita a formatação Markdown
+        }
 
-    try:
-        # Envia a requisição
-        requests.post(url, json=payload, timeout=5) # timeout de 5s
-        print(f"Notificação do Telegram enviada com sucesso para {ip}")
-    except requests.exceptions.RequestException as e:
-        # Se falhar, apenas registra no log do servidor, sem quebrar a aplicação
-        print(f"Erro ao enviar notificação do Telegram: {e}")
+        try:
+            # Envia a requisição
+            requests.post(url, json=payload, timeout=5) # timeout de 5s
+        except requests.exceptions.RequestException as e:
+            # Se falhar para um usuário, apenas registra e continua para o próximo
+            print(f"Erro ao enviar notificação para {chat_id}: {e}")
+    
+    print(f"Notificações enviadas com sucesso para {ip}")
 
 @app.route('/status')
 def get_server_status():
     """
     Este é o endpoint de "health check" (verificação de saúde).
-    Ele simplesmente retorna um JSON indicando que o servidor está online.
     """
     try:
         response = {
@@ -173,11 +193,11 @@ def serve_static(path):
     return send_from_directory(app.static_folder, path)
 
 if __name__ == "__main__":
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+    if not TELEGRAM_BOT_TOKEN:
         print("-" * 50)
-        print("AVISO: Variáveis de ambiente TELEGRAM_BOT_TOKEN ou TELEGRAM_CHAT_ID não foram definidas.")
+        print("AVISO: Variável de ambiente TELEGRAM_BOT_TOKEN não definida.")
         print("O servidor irá rodar, mas as notificações do Telegram não funcionarão.")
-        print("Configure-as e reinicie o servidor.")
+        print("Configure-a e reinicie o servidor.")
         print("-" * 50)
         
     app.run(host="0.0.0.0", port=8000)
