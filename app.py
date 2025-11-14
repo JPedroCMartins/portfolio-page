@@ -2,47 +2,48 @@ from flask import Flask, redirect, url_for, send_from_directory, jsonify, reques
 from flask_cors import CORS
 import json
 import os
-import requests  # Importa a biblioteca de requisições HTTP
-import threading # Para enviar mensagens em segundo plano
+import threading 
 from datetime import datetime
-import re       # Para "escapar" caracteres especiais do Markdown
+import re
+import asyncio  # <-- 1. IMPORTADO O ASYNCIO
+
+# --- Imports do Telegram ---
+import telegram
+from telegram.constants import ParseMode
+from telegram.error import TelegramError
 
 app = Flask(__name__, static_folder="static")
 CORS(app)
 
 # --- Configuração do Bot do Telegram ---
-# O TOKEN ainda é necessário para o bot ENVIAR mensagens.
-# No terminal, antes de rodar o app, faça (Linux/macOS):
-# export TELEGRAM_BOT_TOKEN="SEU_TOKEN_AQUI"
 TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
-
-# Este arquivo irá armazenar os chat_ids dos usuários inscritos.
-# O outro script (bot_listener.py) irá preenchê-lo.
 SUBSCRIBERS_FILE = 'subscribers.json'
 
-# Função para escapar caracteres especiais do MarkdownV2 do Telegram
+# --- Inicializa o objeto do Bot ---
+bot = None
+if TELEGRAM_BOT_TOKEN:
+    bot = telegram.Bot(token=TELEGRAM_BOT_TOKEN)
+else:
+    print("!! Variável de ambiente TELEGRAM_BOT_TOKEN não definida.")
+    print("!! Notificações do Telegram não funcionarão.")
+# --------------------------------------
+
 def escape_markdown(text):
     """Escapa caracteres especiais para o modo MarkdownV2 do Telegram."""
     if not text:
         return ""
-    # Lista de caracteres que precisam ser escapados
     escape_chars = r'\_*[]()~`>#+-=|{}.!'
-    # Adiciona uma barra invertida antes de cada um desses caracteres
     return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
 
 def get_subscribers():
     """Lê a lista de IDs de assinantes do arquivo JSON."""
     if not os.path.exists(SUBSCRIBERS_FILE):
-        return [] # Retorna lista vazia se o arquivo não existir
+        return []
     
     try:
         with open(SUBSCRIBERS_FILE, 'r') as f:
             data = json.load(f)
-            # Espera-se que o JSON contenha uma lista de IDs
-            if isinstance(data, list):
-                return data
-            else:
-                return []
+            return data if isinstance(data, list) else []
     except json.JSONDecodeError:
         print(f"Erro ao ler o arquivo {SUBSCRIBERS_FILE}. Arquivo corrompido?")
         return []
@@ -50,14 +51,40 @@ def get_subscribers():
         print(f"Erro inesperado ao ler {SUBSCRIBERS_FILE}: {e}")
         return []
 
+# --- 2. NOVA FUNÇÃO HELPER ASSÍNCRONA ---
+async def _send_all_messages_async(subscribers, message_text):
+    """
+    Função assíncrona que de fato envia as mensagens, uma por uma.
+    """
+    if not bot:
+        print("!! Bot não inicializado na função async.")
+        return
+
+    parse_mode = ParseMode.MARKDOWN_V2
+
+    for chat_id in subscribers:
+        try:
+            # Aqui usamos 'await' pois estamos em uma função 'async def'
+            await bot.send_message(
+                chat_id=chat_id,
+                text=message_text,
+                parse_mode=parse_mode
+            )
+        except TelegramError as e:
+            # A biblioteca fornece tipos de erro específicos
+            # CORREÇÃO: Usamos 'e' diretamente, em vez de 'e.description'
+            print(f"Erro Telegram ao enviar para {chat_id}: {e}")
+        except Exception as e:
+            print(f"Erro inesperado ao enviar para {chat_id}: {e}")
+
+# --- 3. FUNÇÃO ORIGINAL (SÍNCRONA) MODIFICADA ---
 def send_telegram_notification(visitor_info):
     """
-    Envia uma mensagem formatada para TODOS os assinantes.
-    Esta função é executada em uma thread separada.
+    Prepara a mensagem e dispara a execução assíncrona.
+    Esta função (síncrona) é o que a Thread irá executar.
     """
-    if not TELEGRAM_BOT_TOKEN:
-        print("!! Variável de ambiente TELEGRAM_BOT_TOKEN não definida.")
-        print("!! Notificação não será enviada.")
+    if not bot:
+        print("!! Objeto do Bot não inicializado. Notificação cancelada.")
         return
 
     subscribers = get_subscribers()
@@ -65,44 +92,39 @@ def send_telegram_notification(visitor_info):
         print("Nenhum assinante encontrado. Nenhuma notificação será enviada.")
         return
 
-    # Formata a data e hora
     now = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
-
-    # Coleta e escapa as informações para o Markdown
-    ip = escape_markdown(visitor_info.get('ip', 'N/A'))
-    user_agent = escape_markdown(visitor_info.get('user_agent', 'N/A'))
-    referrer = escape_markdown(visitor_info.get('referrer', 'N/A'))
     
-    # Monta a mensagem usando MarkdownV2 do Telegram
+    # CORREÇÃO: Não escapar NADA que vá dentro de blocos de código (`...` ou ```...```)
+    ip = visitor_info.get('ip', 'N/A')
+    user_agent = visitor_info.get('user_agent', 'N/A')
+    referrer = visitor_info.get('referrer', 'N/A')
+    
+    # CORREÇÃO: O bloco de código ``` deve estar em linhas separadas
     message = (
         f"🔔 *Novo Acesso ao Site* \n\n"
         f"📅 *Horário:* `{now}`\n"
         f"👤 *IP:* `{ip}`\n"
         f"🌐 *Referer:* `{referrer}`\n\n"
-        f"💻 *User Agent (Navegador/SO):*\n"
-        f"```{user_agent}```"
+        f"💻 *User Agent:*\n"
+        f"```\n"  # <-- Linha 1 do bloco
+        f"{user_agent}\n"  # <-- Conteúdo
+        f"```"  # <-- Linha 3 do bloco
     )
     
-    # URL da API do Telegram
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    
-    # Envia a notificação para CADA assinante
     print(f"Enviando notificação para {len(subscribers)} assinante(s)...")
-    for chat_id in subscribers:
-        payload = {
-            'chat_id': chat_id,
-            'text': message,
-            'parse_mode': 'MarkdownV2' # Habilita a formatação Markdown
-        }
-
-        try:
-            # Envia a requisição
-            requests.post(url, json=payload, timeout=5) # timeout de 5s
-        except requests.exceptions.RequestException as e:
-            # Se falhar para um usuário, apenas registra e continua para o próximo
-            print(f"Erro ao enviar notificação para {chat_id}: {e}")
     
-    print(f"Notificações enviadas com sucesso para {ip}")
+    try:
+        # Ponto principal da mudança:
+        # asyncio.run() cria um novo loop de eventos, executa a
+        # coroutine _send_all_messages_async e fecha o loop.
+        asyncio.run(_send_all_messages_async(subscribers, message))
+        
+        print(f"Notificações enviadas com sucesso para {ip}")
+        
+    except Exception as e:
+        print(f"Erro ao executar asyncio.run(): {e}")
+
+# --- O restante do seu código Flask permanece igual ---
 
 @app.route('/status')
 def get_server_status():
@@ -114,14 +136,13 @@ def get_server_status():
             "status": "online",
             "message": "Servidor operando normalmente."
         }
-        return jsonify(response), 200 # Retorna o JSON e o código de status 200 (OK)
-    
+        return jsonify(response), 200
     except Exception as e:
         response = {
             "status": "error",
             "message": str(e)
         }
-        return jsonify(response), 500 # Retorna erro 500 (Internal Server Error)
+        return jsonify(response), 500
 
 @app.route('/')
 def serve_index():
@@ -129,53 +150,36 @@ def serve_index():
     Serve a página principal e dispara a notificação do Telegram.
     """
     try:
-        # --- Início da Notificação ---
-        # Coleta as informações do visitante
         visitor_info = {
-            # Tenta obter o IP real, mesmo se estiver atrás de um proxy (como Heroku/Render)
             "ip": request.headers.get('X-Forwarded-For', request.remote_addr),
             "user_agent": str(request.user_agent),
             "referrer": str(request.referrer) if request.referrer else 'Acesso Direto'
         }
         
-        # Cria e inicia uma thread para enviar a notificação em segundo plano
-        # Isso evita que o usuário tenha que esperar a notificação ser enviada
+        # A thread continua igual, chamando a função síncrona
         notification_thread = threading.Thread(
             target=send_telegram_notification,
             args=(visitor_info,)
         )
         notification_thread.start()
-        # --- Fim da Notificação ---
 
     except Exception as e:
         print(f"Erro ao tentar iniciar a thread de notificação: {e}")
-        # Continua a servir a página mesmo se a coleta de dados falhar
     
-    # Envia o arquivo index.html como antes
     return send_from_directory(app.static_folder, 'index.html')
 
 @app.route('/qr_code')
 def qr_code():
-    # Caminho do arquivo de acesso
     caminho_arquivo = 'acesso.json'
-
-    # Se o arquivo existir, lê o número atual de acessos
     if os.path.exists(caminho_arquivo):
         with open(caminho_arquivo, 'r') as f:
             dados = json.load(f)
             acessos = dados.get('acessos', 0)
     else:
         acessos = 0
-
-    # Soma +1
     acessos += 1
-
-    # Salva o novo valor
     with open(caminho_arquivo, 'w') as f:
         json.dump({'acessos': acessos}, f, indent=2)
-
-    # Redireciona para a função serve_index
-    # A função 'serve_index' cuidará de enviar a notificação do Telegram
     return redirect(url_for('serve_index'))
 
 @app.route('/qrcode/ver_acessos')
@@ -193,11 +197,10 @@ def serve_static(path):
     return send_from_directory(app.static_folder, path)
 
 if __name__ == "__main__":
-    if not TELEGRAM_BOT_TOKEN:
+    if not bot: # Verifica se o bot foi inicializado
         print("-" * 50)
-        print("AVISO: Variável de ambiente TELEGRAM_BOT_TOKEN não definida.")
+        print("AVISO: O objeto do Bot não foi inicializado (Token ausente).")
         print("O servidor irá rodar, mas as notificações do Telegram não funcionarão.")
-        print("Configure-a e reinicie o servidor.")
         print("-" * 50)
         
     app.run(host="0.0.0.0", port=8000)

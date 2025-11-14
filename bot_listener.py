@@ -5,9 +5,9 @@ import json
 
 # --- Configuração ---
 # Pega o token da variável de ambiente
-TOKEN = '8554899678:AAFrQZRcF2a9LP6tqVnj8K_r-zU2fc1ntoo'
+TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 # Pega a senha que o bot vai exigir
-BOT_PASSWORD = '123'
+BOT_PASSWORD = os.environ.get('BOT_PASSWORD')
 
 # Arquivo para salvar os IDs dos assinantes
 SUBSCRIBERS_FILE = 'subscribers.json'
