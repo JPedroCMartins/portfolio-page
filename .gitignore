@@ -1,2 +1,31 @@
+# --- Python & Bytecode ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# --- Ambientes Virtuais (uv usa .venv por padrão) ---
+.venv/
+venv/
+env/
+.Python
+
+# --- Variáveis de Ambiente (SEGURANÇA CRÍTICA) ---
 .env
-venv
+
+# --- Dados em Tempo de Execução ---
+acesso.json
+
+# --- Logs ---
+*.log
+
+# --- IDEs e Editores ---
+.vscode/
+.idea/
+
+# --- Sistema Operacional ---
+.DS_Store
+Thumbs.db
+
+# --- Docker ---
+docker-compose.override.yml
