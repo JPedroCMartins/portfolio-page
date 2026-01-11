@@ -4,368 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>João Pedro Correia Martins - Desenvolvedor de Software</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
 
-    <style>
-        :root {
-            --dark-bg: #1a1a2e;
-            /* Fundo principal escuro */
-            --dark-card: #16213e;
-            /* Fundo dos cards/navbar */
-            --dark-primary: #0f3460;
-            /* Detalhe primário */
-            --highlight: #e94560;
-            /* Cor de destaque/ação */
-            --text-light: #f0f0f0;
-            /* Texto principal */
-            --text-secondary: #a7a9be;
-            /* Texto secundário */
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--dark-bg);
-            color: var(--text-light);
-            /* Para o data-bs-spy funcionar corretamente */
-            position: relative;
-        }
-
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-            font-weight: 600;
-            color: var(--text-light);
-        }
-
-        .section-padding {
-            padding: 80px 0;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 60px;
-            position: relative;
-        }
-
-        .section-title::after {
-            content: '';
-            width: 80px;
-            height: 4px;
-            background-color: var(--highlight);
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 2px;
-        }
-
-        /* --- Navbar --- */
-        .navbar {
-            background-color: var(--dark-card) !important;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            transition: background-color 0.3s ease;
-        }
-
-        .navbar .navbar-brand {
-            font-weight: 700;
-            color: var(--text-light);
-        }
-
-        .navbar .nav-link {
-            color: var(--text-secondary);
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .navbar .nav-link.active,
-        .navbar .nav-link:hover {
-            color: var(--highlight);
-        }
-
-        /* --- Hero --- */
-        #inicio {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        #inicio h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-        }
-
-        #inicio .text-highlight {
-            color: var(--highlight);
-        }
-
-        .typed-cursor {
-            color: var(--highlight);
-            font-size: 3.5rem;
-        }
-
-        #inicio .btn-highlight {
-            background-color: var(--highlight);
-            color: var(--text-light);
-            border: 2px solid var(--highlight);
-            font-weight: 600;
-            padding: 12px 30px;
-            transition: all 0.3s;
-        }
-
-        #inicio .btn-highlight:hover {
-            background-color: transparent;
-            color: var(--highlight);
-        }
-
-        /* --- Habilidades --- */
-        .skill-icon-box {
-            text-align: center;
-            padding: 20px;
-            background-color: var(--dark-card);
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            height: 100%;
-        }
-
-        .skill-icon-box:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        .skill-icon-box i {
-            font-size: 3.5rem;
-            color: var(--highlight);
-        }
-
-        .skill-icon-box h5 {
-            margin-top: 15px;
-            font-weight: 500;
-        }
-
-        /* --- Timeline (Experiência/Formação) --- */
-        .timeline {
-            position: relative;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .timeline::after {
-            content: '';
-            position: absolute;
-            width: 4px;
-            background-color: var(--dark-primary);
-            top: 0;
-            bottom: 0;
-            left: 50%;
-            margin-left: -2px;
-        }
-
-        .timeline-item {
-            padding: 10px 40px;
-            position: relative;
-            background-color: inherit;
-            width: 50%;
-        }
-
-        .timeline-item::after {
-            /* Círculo na linha */
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            right: -10px;
-            background-color: var(--text-light);
-            border: 4px solid var(--highlight);
-            top: 20px;
-            border-radius: 50%;
-            z-index: 1;
-        }
-
-        .timeline-item.left {
-            left: 0;
-        }
-
-        .timeline-item.right {
-            left: 50%;
-        }
-
-        .timeline-item.right::after {
-            left: -10px;
-        }
-
-        .timeline-content {
-            padding: 20px;
-            background-color: var(--dark-card);
-            position: relative;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .timeline-content .date {
-            color: var(--highlight);
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .timeline-content h4 {
-            margin-bottom: 10px;
-        }
-
-        .timeline-content p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        /* Responsivo para Timeline */
-        @media screen and (max-width: 768px) {
-            .timeline::after {
-                left: 31px;
-            }
-
-            .timeline-item {
-                width: 100%;
-                padding-left: 70px;
-                padding-right: 25px;
-            }
-
-            .timeline-item.right {
-                left: 0%;
-            }
-
-            .timeline-item.left::after,
-            .timeline-item.right::after {
-                left: 21px;
-            }
-        }
-
-        /* --- Projetos --- */
-        .card {
-            background-color: var(--dark-card);
-            border: none;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-        }
-
-        .card-img-top {
-            height: 220px;
-            object-fit: cover;
-            filter: grayscale(30%);
-            transition: filter 0.3s;
-        }
-
-        .card:hover .card-img-top {
-            filter: grayscale(0%);
-        }
-
-        .card-body {
-            padding: 25px;
-        }
-
-        .card-text {
-            color: var(--text-secondary);
-        }
-
-        .card-footer {
-            background-color: var(--dark-primary);
-            border-top: none;
-        }
-
-        .card-footer a {
-            color: var(--highlight);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s;
-        }
-
-        .card-footer a:hover {
-            color: var(--text-light);
-        }
-
-        .tech-badge {
-            background-color: var(--dark-primary);
-            color: var(--text-secondary);
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        /* --- Contato --- */
-        #contato {
-            background-color: var(--dark-card);
-        }
-
-        .form-control {
-            background-color: var(--dark-bg);
-            border: 2px solid var(--dark-primary);
-            color: var(--text-light);
-        }
-
-        .form-control:focus {
-            background-color: var(--dark-bg);
-            border-color: var(--highlight);
-            color: var(--text-light);
-            box-shadow: none;
-        }
-
-        .btn-submit {
-            background-color: var(--highlight);
-            color: var(--text-light);
-            border: 2px solid var(--highlight);
-            font-weight: 600;
-            padding: 12px 30px;
-            transition: all 0.3s;
-        }
-
-        .btn-submit:hover {
-            background-color: transparent;
-            color: var(--highlight);
-        }
-
-        .social-links a {
-            font-size: 2rem;
-            color: var(--text-secondary);
-            margin: 0 10px;
-            transition: color 0.3s;
-        }
-
-        .social-links a:hover {
-            color: var(--highlight);
-        }
-
-        /* --- Rodapé --- */
-        footer {
-            background-color: var(--dark-bg);
-            padding: 20px 0;
-            text-align: center;
-            border-top: 1px solid var(--dark-primary);
-        }
-
-        footer p {
-            margin: 0;
-            color: var(--text-secondary);
-        }
-    </style>
 </head>
 
 <body data-bs-spy="scroll" data-bs-target="#navbar-portfolio">
@@ -406,8 +56,8 @@
             <h2 class="section-title" data-aos="fade-up">Sobre Mim</h2>
             <div class="row align-items-center">
                 <div class="col-lg-4 text-center" data-aos="fade-right" data-aos-delay="200">
-                    <img src="foto.jpg" class="img-fluid rounded-circle" alt="Foto de João Pedro Correia Martins"
-                        style="border: 5px solid var(--dark-primary);">
+                    <img src="{{ url_for('static', filename='images/foto.jpg') }}" class="img-fluid rounded-circle"
+                        alt="Foto de João Pedro Correia Martins" style="border: 5px solid var(--dark-primary);">
                 </div>
                 <div class="col-lg-8" data-aos="fade-left" data-aos-delay="400">
                     <h3 class="mb-3">Quem sou eu?</h3>
@@ -535,7 +185,8 @@
 
                 <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                     <div class="card h-100">
-                        <img src="background_projeto_1.jpg" class="card-img-top" alt="Projeto 1">
+                        <img src="{{ url_for('static', filename='images/background_projeto_1.jpg') }}"
+                            class="card-img-top" alt="Projeto 1">
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title" style="color: #f0f0f0;">Memorial Virtual</h5>
                             <p class="card-text flex-grow-1">Eternize
@@ -590,7 +241,8 @@
                 </div>
                 <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                     <div class="card h-100">
-                        <img src="background_projeto_2.jpg" class="card-img-top" alt="Projeto 1">
+                        <img src="{{ url_for('static', filename='images/background_projeto_2.jpg') }}"
+                            class="card-img-top" alt="Projeto 1">
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title" style="color: #f0f0f0;">Encurtador de Link</h5>
                             <p class="card-text flex-grow-1">Um serviço de encurtamento de URLs rápido e eficiente. Este
@@ -627,7 +279,8 @@
                 </div>
                 <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                     <div class="card h-100">
-                        <img src="background_projeto_3.jpg" class="card-img-top" alt="Projeto 1">
+                        <img src="{{ url_for('static', filename='images/background_projeto_3.jpg') }}"
+                            class="card-img-top" alt="Projeto 1">
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title" style="color: #f0f0f0;">Relógio pomodoro</h5>
                             <p class="card-text flex-grow-1">

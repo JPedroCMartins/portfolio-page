@@ -1,12 +1,10 @@
-from flask import Flask, redirect, url_for, send_from_directory, jsonify, request
+from flask import Flask, redirect, render_template, url_for, send_from_directory, jsonify, request
 from flask_cors import CORS
 import json
 import os
 
 app = Flask(__name__, static_folder="static")
 CORS(app)
-
-# --- Rotas da Aplicação ---
 
 @app.route('/status')
 def get_server_status():
@@ -31,7 +29,7 @@ def serve_index():
     """
     Serve a página principal.
     """
-    return send_from_directory(app.static_folder, 'index.html')
+    return render_template("index.html")
 
 @app.route('/qr_code')
 def qr_code():
