@@ -1,24 +1,12 @@
 version: '3.8'
 
 services:
-  # Serviço 1: O Servidor Web (app.py)
   portfolio-web:
-    build: .
+    build:
+      context: .
     container_name: portfolio-web
-    restart: always
+    restart: unless-stopped
     ports:
       - "8000:8000"
-    # O comando padrão do Dockerfile (gunicorn) será usado
-    env_file:
-      - .env # Carrega as variáveis de ambiente do arquivo .env
-
-  # Serviço 2: O Ouvinte do Telegram (bot_listener.py)
-  bot-listener:
-    build: .
-    container_name: bot-listener
-    restart: always
-    # Sobrescreve o CMD do Dockerfile para rodar o listener
-    command: ["python", "bot_listener.py"]
-    env_file:
-      - .env # Carrega as mesmas variáveis
-    # Não precisa de 'ports', pois só se comunica com a API do Telegram
+    volumes:
+      - ./acesso.json:/app/acesso.json
