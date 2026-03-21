@@ -182,7 +182,38 @@
         <div class="container">
             <h2 class="section-title" data-aos="fade-up">Meus Projetos</h2>
             <div class="row g-4">
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card h-100">
+                        <img src="{{ url_for('static', filename='images/background_projeto_4.jpg') }}"
+                            class="card-img-top" alt="Projeto 1">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title" style="color: #f0f0f0;">Blog | Idéias e Criações </h5>
+                            <p class="card-text flex-grow-1">Ideias e criações sobre tecnologia, programação e outros assuntos que me interessam.</p>
+                            <div>
+                                <span class="badge tech-badge">Python</span>
+                                <span class="badge tech-badge">Django</span>
+                                <span class="badge tech-badge">PostgreSQL</span>
+                                <span class="badge tech-badge">Docker</span>
+                            </div>
+                        </div>
 
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+
+                            <a href="https://github.com/JPedroCMartins/blog" target="_blank">
+                                <i class="bi bi-github"></i> Ver Código
+                            </a>
+
+                            <div class="btn-group">
+                                <a type="button" class="btn btn-sm"
+                                    style="--bs-btn-color: var(--highlight); --bs-btn-border-color: var(--highlight); --bs-btn-hover-color: #fff; --bs-btn-hover-bg: var(--highlight); --bs-btn-hover-border-color: var(--highlight); --bs-btn-active-color: #fff; --bs-btn-active-bg: var(--highlight); --bs-btn-active-border-color: var(--highlight);"
+                                    href="https://blog.p-martins.com/" target="_blank">
+                                    <i class="bi bi-eye-fill"></i> Acessar
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
                 <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                     <div class="card h-100">
                         <img src="{{ url_for('static', filename='images/background_projeto_1.jpg') }}"
