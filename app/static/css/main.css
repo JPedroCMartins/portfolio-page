@@ -83,6 +83,18 @@ h6 {
     align-items: center;
     justify-content: center;
     text-align: center;
+    background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-primary) 100%);
+}
+
+.profile-img {
+    border: 5px solid var(--dark-primary);
+    box-shadow: 0 0 20px rgba(233, 69, 96, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(233, 69, 96, 0.6);
 }
 
 #inicio h1 {
@@ -125,7 +137,12 @@ h6 {
 
 .skill-icon-box:hover {
     transform: translateY(-10px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 10px 30px rgba(233, 69, 96, 0.2);
+    border-color: var(--highlight);
+}
+
+.skill-icon-box {
+    border: 1px solid transparent; /* Preparação para o hover */
 }
 
 .skill-icon-box i {
@@ -246,6 +263,7 @@ h6 {
 
 .card:hover {
     transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(233, 69, 96, 0.2);
 }
 
 .card-img-top {
