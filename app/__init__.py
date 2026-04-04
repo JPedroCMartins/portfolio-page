@@ -1,10 +1,12 @@
-from flask import Flask, redirect, render_template, url_for, send_from_directory, jsonify, request
-from flask_cors import CORS
 import json
 import os
+from flask import Flask, redirect, render_template, url_for, send_from_directory, jsonify
+from flask_cors import CORS
 
 app = Flask(__name__, static_folder="static")
 CORS(app)
+
+ACESSO_FILE = 'acesso.json'
 
 @app.route('/status')
 def get_server_status():
@@ -31,27 +33,28 @@ def serve_index():
     """
     return render_template("index.html")
 
+def _ler_acessos():
+    """
+    Função auxiliar para ler a quantidade de acessos do arquivo de forma segura.
+    """
+    if os.path.exists(ACESSO_FILE):
+        with open(ACESSO_FILE, 'r') as f:
+            try:
+                dados = json.load(f)
+                return dados.get('acessos', 0)
+            except json.JSONDecodeError:
+                pass
+    return 0
+
 @app.route('/qr_code')
 def qr_code():
     """
     Incrementa o contador de acessos e redireciona para a home.
     """
-    caminho_arquivo = 'acesso.json'
+    acessos = _ler_acessos() + 1
     
-    # Lê o contador atual
-    if os.path.exists(caminho_arquivo):
-        with open(caminho_arquivo, 'r') as f:
-            try:
-                dados = json.load(f)
-                acessos = dados.get('acessos', 0)
-            except json.JSONDecodeError:
-                acessos = 0
-    else:
-        acessos = 0
-    
-    # Incrementa e salva
-    acessos += 1
-    with open(caminho_arquivo, 'w') as f:
+    # Salva a nova contagem
+    with open(ACESSO_FILE, 'w') as f:
         json.dump({'acessos': acessos}, f, indent=2)
         
     return redirect(url_for('serve_index'))
@@ -61,16 +64,7 @@ def ver_acessos():
     """
     Retorna o JSON com a contagem de acessos.
     """
-    caminho_arquivo = 'acesso.json'
-    if os.path.exists(caminho_arquivo):
-        with open(caminho_arquivo, 'r') as f:
-            try:
-                dados = json.load(f)
-            except json.JSONDecodeError:
-                dados = {'acessos': 0}
-    else:
-        dados = {'acessos': 0}
-    return jsonify(dados)
+    return jsonify({'acessos': _ler_acessos()})
 
 @app.route('/<path:path>')
 def serve_static(path):
